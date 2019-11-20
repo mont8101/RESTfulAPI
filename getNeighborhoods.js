@@ -28,41 +28,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.get("/codes", (req, res)=>{        
     var code = req.query.code;
-    /*if(code == null){
-        db.all("SELECT * FROM codes", (err, rows)=>{
-            //console.log(code);
-            var dbCodes = "";
-            //console.log(rows[4]);
-            for(i = 0; i < rows.length; i++) {
-                dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '",' + "\n"
-            }
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200).send(dbCodes);
-            
-            db.close();
-        });       
-    }else{
-        db.all("SELECT * FROM codes", (err, rows)=>{
-            var dbCodes = "";
-            code = code.toString();
-            var codeArr = code.split(",");
-            console.log(rows.length);
-            console.log(codeArr);
-            for(var i = 0; i<rows.length; i++){
-                for(var j = 0; j<codeArr.length; j++){
-                    //console.log(i)
-                    if (rows[i]["code"]==codeArr[j]){
-                        dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '",' + "\n"
-                    }
-                }
-                
-            }
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200).send(dbCodes);
-            console.log(dbCodes);
-            db.close();
-        });  
-    }*/
+    var format = req.query.format;
+    
     db.all("SELECT * FROM codes", (err, rows)=>{
         var dbCodes = "";
 
