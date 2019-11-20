@@ -31,12 +31,14 @@ app.get("/codes", (req, res)=>{
     var format = req.query.format;
     
     db.all("SELECT * FROM codes", (err, rows)=>{
-        var dbCodes = "";
+        var dbCodes = "{\n";
 
         if(code == null){
-            for(i = 0; i < rows.length; i++) {
-                dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '",' + "\n"
+            for(i = 0; i < rows.length-1; i++) {
+                dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '",' + "\n";
+
             }
+            dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '"\n}';
         }else{
             code = code.toString();
             var codeArr = code.split(",");
@@ -44,14 +46,14 @@ app.get("/codes", (req, res)=>{
             console.log(codeArr);
             for(var i = 0; i<rows.length; i++){
                 for(var j = 0; j<codeArr.length; j++){
-                    //console.log(i)
                     if (rows[i]["code"]==codeArr[j]){
-                        dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '",' + "\n"
+                        dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '",' + "\n";
                     }
-                }
-                
+                }              
             }
+            dbCodes = dbCodes + "}"
         }
+        //dbCodes = JSON.parse(dbCodes);
         res.setHeader('Content-Type', 'application/json');
         res.status(200).send(dbCodes);
     });  
@@ -59,11 +61,33 @@ app.get("/codes", (req, res)=>{
 });
 
 app.get("/neighborhoods", (req, res)=>{
+    var id = req.query.id;
+    
     db.all("SELECT * FROM neighborhoods", (err, rows)=>{
         var dbNeighborhoods = "";
-        for(i = 0; i < rows.length; i++) {
-            dbNeighborhoods = dbNeighborhoods + '"N' + rows[i]["neighborhood_number"] + '": "' + rows[i]["neighborhood_name"] + '",' + "\n"
+        console.log(rows);
+        if(id == null){
+            for(i = 0; i < rows.length; i++) {
+                dbNeighborhoods = dbNeighborhoods + '"N' + rows[i]["neighborhood_number"] + '": "' + rows[i]["neighborhood_name"] + '",' + "\n"
+            }
+        }else{ 
+            id = id.toString();
+            id = id.split(",");
+            console.log(id);
+            //console.log(rows[1]["neighborhood_number"]);
+            console.log(rows.length);
+            for(var i = 0; i<rows.length; i++){
+                for(var j = 0; j<id.lenght; j++){
+                    //console.log(rows[i]["neighborhood_number"]);
+                    console.log(i);
+                    if(rows[i]["neighborhood_number"]==id[j]){
+                        
+                        dbNeighborhoods = dbNeighborhoods + '"N' + rows[i]["neighborhood_number"] + '": "' + rows[i]["neighborhood_name"] + '",' + "\n";
+                    }
+                }
+            } 
         }
+        
         res.setHeader('Content-Type', 'application/json');
         res.status(200).send(dbNeighborhoods);
     });
