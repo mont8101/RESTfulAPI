@@ -49,10 +49,8 @@ app.get("/neighborhoods", (req, res)=>{
 });
 
 app.get("/incidents", (req, res)=>{
-    //db.all("SELECT * FROM incidents", (err, rows)=>{
     db.all("SELECT case_number, code, incident, police_grid, neighborhood_number, block, DATE(date_time) as dateOfIncident, TIME(date_time) as timeOfIncident FROM incidents", (err, rows)=>{
         var dbIncidents = "";
-        //db.all("SELECT DATE('date_time') FROM incidents")
         for(i = 0; i < rows.length; i++) {
             date = rows[i]["date_time"]
             dbIncidents = dbIncidents + '"I' + rows[i]["case_number"] + '": {' + "\n" +
