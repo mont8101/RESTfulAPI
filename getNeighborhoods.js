@@ -26,36 +26,15 @@ var db = new sqlite3.Database(db_filename, sqlite3.OPEN_READONLY, (err) => {
 app.use(express.static(public_dir));
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.get("/codes", (req, res)=>{        
-    var code = req.query.code;
-    var format = req.query.format;
-    
+app.get("/codes", (req, res)=>{
     db.all("SELECT * FROM codes", (err, rows)=>{
         var dbCodes = "";
-
-        if(code == null){
-            for(i = 0; i < rows.length; i++) {
-                dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '",' + "\n"
-            }
-        }else{
-            code = code.toString();
-            var codeArr = code.split(",");
-            console.log(rows.length);
-            console.log(codeArr);
-            for(var i = 0; i<rows.length; i++){
-                for(var j = 0; j<codeArr.length; j++){
-                    //console.log(i)
-                    if (rows[i]["code"]==codeArr[j]){
-                        dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '",' + "\n"
-                    }
-                }
-                
-            }
+        for(i = 0; i < rows.length; i++) {
+            dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '",' + "\n"
         }
         res.setHeader('Content-Type', 'application/json');
         res.status(200).send(dbCodes);
-    });  
-    
+    });
 });
 
 app.get("/neighborhoods", (req, res)=>{
@@ -87,5 +66,18 @@ app.get("/incidents", (req, res)=>{
         res.status(200).send(dbIncidents);
     });
 });
+
+app.put("/new-incident", (req, res)=>{
+    db.run("INSERT INTO items(case_number, DATE(date_time), TIME(date_time), code, incident, police_grid, neighborhood_number, block) VALUES (?,?,?,?,?,?,?,?))", (err, rows) => {
+        if(err) {
+            res.status(500).send("Case already exists in database");
+        }
+        else {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).send(rows);  
+        }
+    });
+});
+
 console.log('Now listening on port ' + port);
 app.listen(port);
