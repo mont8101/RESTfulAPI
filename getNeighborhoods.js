@@ -65,7 +65,7 @@ app.get("/neighborhoods", (req, res)=>{
     
     db.all("SELECT * FROM neighborhoods", (err, rows)=>{
         var dbNeighborhoods = "";
-        console.log(rows);
+        //console.log(rows);
         if(id == null){
             for(i = 0; i < rows.length; i++) {
                 dbNeighborhoods = dbNeighborhoods + '"N' + rows[i]["neighborhood_number"] + '": "' + rows[i]["neighborhood_name"] + '",' + "\n"
@@ -73,13 +73,13 @@ app.get("/neighborhoods", (req, res)=>{
         }else{ 
             id = id.toString();
             id = id.split(",");
-            console.log(id);
+            //console.log(id);
             //console.log(rows[1]["neighborhood_number"]);
-            console.log(rows.length);
+            //console.log(rows.length);
             for(var i = 0; i<rows.length; i++){
-                for(var j = 0; j<id.lenght; j++){
+                for(var j = 0; j<id.length; j++){
                     //console.log(rows[i]["neighborhood_number"]);
-                    console.log(i);
+                    //console.log(i);
                     if(rows[i]["neighborhood_number"]==id[j]){
                         
                         dbNeighborhoods = dbNeighborhoods + '"N' + rows[i]["neighborhood_number"] + '": "' + rows[i]["neighborhood_name"] + '",' + "\n";
