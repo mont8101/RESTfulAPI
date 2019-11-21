@@ -111,5 +111,18 @@ app.get("/incidents", (req, res)=>{
         res.status(200).send(dbIncidents);
     });
 });
+
+app.put("/new-incident", (req, res)=>{
+    db.run("INSERT INTO items(case_number, DATE(date_time), TIME(date_time), code, incident, police_grid, neighborhood_number, block) VALUES (?,?,?,?,?,?,?,?))", (err, rows) => {
+        if(err) {
+            res.status(500).send("Case already exists in database");
+        }
+        else {
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).send(rows);  
+        }
+    });
+});
+
 console.log('Now listening on port ' + port);
 app.listen(port);
