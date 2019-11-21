@@ -32,33 +32,35 @@ app.get("/codes", (req, res)=>{
    
     db.all("SELECT * FROM codes", (err, rows) => {
         if (format == null || format == "JSON") {
-            var dbCodes = "{\n";
+            var dbCodes = "{";
 
             if (code == null) {
                 for (i = 0; i < rows.length - 1; i++) {
-                    dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '",' + "\n";
+                    dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '",' ;
 
                 }
-                dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '"\n}';
+                dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '"}';
             } else {
                 code = code.toString();
                 var codeArr = code.split(",");
-                console.log(rows.length);
-                console.log(codeArr);
                 for (var i = 0; i < rows.length; i++) {
                     for (var j = 0; j < codeArr.length; j++) {
                         if (rows[i]["code"] == codeArr[j]) {
-                            dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '",' + "\n";
+                            dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '",' + "";
                         }
                     }
                 }
+                dbCodes = dbCodes.substring(0,dbCodes.length-1);
                 dbCodes = dbCodes + "}"
             }
+            dbCodes = JSON.parse(dbCodes);
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).send(dbCodes);
         }else if(format == "XML"){
             var dbCodes = "<codes>\n";
             if(code == null){
                 for(var i = 0; i<rows.length; i++){
-                    dbCodes = dbCodes + "<"+rows[i]["code"]+">"+rows[i]["incident_type"]+"</"+rows[i]["code"]+">\n";
+                    dbCodes = dbCodes + "<C"+rows[i]["code"]+">"+rows[i]["incident_type"]+"</C"+rows[i]["code"]+">\n";
                 }
                 dbCodes = dbCodes + "</codes>";
             }else{
@@ -67,16 +69,16 @@ app.get("/codes", (req, res)=>{
                 for(var i = 0; i<rows.length; i++){
                     for(var j=0; j<code.length;j++){
                         if(rows[i]["code"] == codeArr[j]){
-                            dbCodes = dbCodes + "<"+rows[i]["code"]+">"+rows[i]["incident_type"]+"</"+rows[i]["code"]+">\n";
+                            dbCodes = dbCodes + "<C"+rows[i]["code"]+">"+rows[i]["incident_type"]+"</C"+rows[i]["code"]+">\n";
                         }
                     }
                 }
                 dbCodes = dbCodes + "</codes>";
             }
+            res.setHeader('Content-Type', 'application/xml');
+            res.status(200).send(dbCodes);
         }
-        //dbCodes = JSON.parse(dbCodes);
-        res.setHeader('Content-Type', 'application/json');
-        res.status(200).send(dbCodes);
+        
     });
 
 });
@@ -88,32 +90,29 @@ app.get("/neighborhoods", (req, res) => {
     db.all("SELECT * FROM neighborhoods", (err, rows) => {
         if (format == null || format == "JSON") {
             var dbNeighborhoods = "";
-            //console.log(rows);
             if (id == null) {
                 for (i = 0; i < rows.length; i++) {
-                    dbNeighborhoods = dbNeighborhoods + '"N' + rows[i]["neighborhood_number"] + '": "' + rows[i]["neighborhood_name"] + '",' + "\n"
+                    dbNeighborhoods = dbNeighborhoods + '"N' + rows[i]["neighborhood_number"] + '": "' + rows[i]["neighborhood_name"] + '",';
                 }
             } else {
                 id = id.toString();
                 id = id.split(",");
-                //console.log(id);
-                //console.log(rows[1]["neighborhood_number"]);
-                //console.log(rows.length);
                 for (var i = 0; i < rows.length; i++) {
                     for (var j = 0; j < id.length; j++) {
                         if (rows[i]["neighborhood_number"] == id[j]) {
 
-                            dbNeighborhoods = dbNeighborhoods + '"N' + rows[i]["neighborhood_number"] + '": "' + rows[i]["neighborhood_name"] + '",' + "\n";
+                            dbNeighborhoods = dbNeighborhoods + '"N' + rows[i]["neighborhood_number"] + '": "' + rows[i]["neighborhood_name"] + '",';
                         }
                     }
                 }
             }
-
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200).send(dbNeighborhoods);
         } else if (format == "XML") {
             var dbNeighborhoods = "<neighborhoods>\n";
             if(id == null){
                 for (i = 0; i < rows.length; i++) {
-                    dbNeighborhoods = dbNeighborhoods + "<"+rows[i]["neighborhood_number"]+">"+rows[i]["neighborhood_name"]+ "</"+rows[i]["neighborhood_number"]+">\n";
+                    dbNeighborhoods = dbNeighborhoods + "<N"+rows[i]["neighborhood_number"]+">"+rows[i]["neighborhood_name"]+ "</N"+rows[i]["neighborhood_number"]+">\n";
                 }
                 dbNeighborhoods += "</neightborhoods>";
             }else{
@@ -124,15 +123,16 @@ app.get("/neighborhoods", (req, res) => {
                     for (var j = 0; j < id.length; j++) {
                         if (rows[i]["neighborhood_number"] == id[j]) {
 
-                            dbNeighborhoods = dbNeighborhoods + "<"+rows[i]["neighborhood_number"]+">"+rows[i]["neighborhood_name"]+ "</"+rows[i]["neighborhood_number"]+">\n";
+                            dbNeighborhoods = dbNeighborhoods + "<N"+rows[i]["neighborhood_number"]+">"+rows[i]["neighborhood_name"]+ "</N"+rows[i]["neighborhood_number"]+">\n";
                         }
                     }
                 }
                 dbNeighborhoods += "</neightborhoods>";
             }
+            res.setHeader('Content-Type', 'application/xml');
+            res.status(200).send(dbNeighborhoods);
         }
-        res.setHeader('Content-Type', 'application/json');
-        res.status(200).send(dbNeighborhoods);
+        
     });
 });
 
