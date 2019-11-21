@@ -81,34 +81,56 @@ app.get("/codes", (req, res)=>{
 
 });
 
-app.get("/neighborhoods", (req, res)=>{
+app.get("/neighborhoods", (req, res) => {
     var id = req.query.id;
-    
-    db.all("SELECT * FROM neighborhoods", (err, rows)=>{
-        var dbNeighborhoods = "";
-        //console.log(rows);
-        if(id == null){
-            for(i = 0; i < rows.length; i++) {
-                dbNeighborhoods = dbNeighborhoods + '"N' + rows[i]["neighborhood_number"] + '": "' + rows[i]["neighborhood_name"] + '",' + "\n"
-            }
-        }else{ 
-            id = id.toString();
-            id = id.split(",");
-            //console.log(id);
-            //console.log(rows[1]["neighborhood_number"]);
-            //console.log(rows.length);
-            for(var i = 0; i<rows.length; i++){
-                for(var j = 0; j<id.length; j++){
-                    //console.log(rows[i]["neighborhood_number"]);
-                    //console.log(i);
-                    if(rows[i]["neighborhood_number"]==id[j]){
-                        
-                        dbNeighborhoods = dbNeighborhoods + '"N' + rows[i]["neighborhood_number"] + '": "' + rows[i]["neighborhood_name"] + '",' + "\n";
+    var format = req.query.format;
+
+    db.all("SELECT * FROM neighborhoods", (err, rows) => {
+        if (format == null || format == "JSON") {
+            var dbNeighborhoods = "";
+            //console.log(rows);
+            if (id == null) {
+                for (i = 0; i < rows.length; i++) {
+                    dbNeighborhoods = dbNeighborhoods + '"N' + rows[i]["neighborhood_number"] + '": "' + rows[i]["neighborhood_name"] + '",' + "\n"
+                }
+            } else {
+                id = id.toString();
+                id = id.split(",");
+                //console.log(id);
+                //console.log(rows[1]["neighborhood_number"]);
+                //console.log(rows.length);
+                for (var i = 0; i < rows.length; i++) {
+                    for (var j = 0; j < id.length; j++) {
+                        if (rows[i]["neighborhood_number"] == id[j]) {
+
+                            dbNeighborhoods = dbNeighborhoods + '"N' + rows[i]["neighborhood_number"] + '": "' + rows[i]["neighborhood_name"] + '",' + "\n";
+                        }
                     }
                 }
-            } 
+            }
+
+        } else if (format == "XML") {
+            var dbNeighborhoods = "<neighborhoods>\n";
+            if(id == null){
+                for (i = 0; i < rows.length; i++) {
+                    dbNeighborhoods = dbNeighborhoods + "<"+rows[i]["neighborhood_number"]+">"+rows[i]["neighborhood_name"]+ "</"+rows[i]["neighborhood_number"]+">\n";
+                }
+                dbNeighborhoods += "</neightborhoods>";
+            }else{
+                var dbNeighborhoods = "<neighborhoods>\n";
+                id = id.toString();
+                id = id.split(",");
+                for (var i = 0; i < rows.length; i++) {
+                    for (var j = 0; j < id.length; j++) {
+                        if (rows[i]["neighborhood_number"] == id[j]) {
+
+                            dbNeighborhoods = dbNeighborhoods + "<"+rows[i]["neighborhood_number"]+">"+rows[i]["neighborhood_name"]+ "</"+rows[i]["neighborhood_number"]+">\n";
+                        }
+                    }
+                }
+                dbNeighborhoods += "</neightborhoods>";
+            }
         }
-        
         res.setHeader('Content-Type', 'application/json');
         res.status(200).send(dbNeighborhoods);
     });
