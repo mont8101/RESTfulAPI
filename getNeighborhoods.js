@@ -29,35 +29,56 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.get("/codes", (req, res)=>{        
     var code = req.query.code;
     var format = req.query.format;
-    
-    db.all("SELECT * FROM codes", (err, rows)=>{
-        var dbCodes = "{\n";
+   
+    db.all("SELECT * FROM codes", (err, rows) => {
+        if (format == null || format == "JSON") {
+            var dbCodes = "{\n";
 
-        if(code == null){
-            for(i = 0; i < rows.length-1; i++) {
-                dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '",' + "\n";
+            if (code == null) {
+                for (i = 0; i < rows.length - 1; i++) {
+                    dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '",' + "\n";
 
-            }
-            dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '"\n}';
-        }else{
-            code = code.toString();
-            var codeArr = code.split(",");
-            console.log(rows.length);
-            console.log(codeArr);
-            for(var i = 0; i<rows.length; i++){
-                for(var j = 0; j<codeArr.length; j++){
-                    if (rows[i]["code"]==codeArr[j]){
-                        dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '",' + "\n";
+                }
+                dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '"\n}';
+            } else {
+                code = code.toString();
+                var codeArr = code.split(",");
+                console.log(rows.length);
+                console.log(codeArr);
+                for (var i = 0; i < rows.length; i++) {
+                    for (var j = 0; j < codeArr.length; j++) {
+                        if (rows[i]["code"] == codeArr[j]) {
+                            dbCodes = dbCodes + '"C' + rows[i]["code"] + '": "' + rows[i]["incident_type"] + '",' + "\n";
+                        }
                     }
-                }              
+                }
+                dbCodes = dbCodes + "}"
             }
-            dbCodes = dbCodes + "}"
+        }else if(format == "XML"){
+            var dbCodes = "<codes>\n";
+            if(code == null){
+                for(var i = 0; i<rows.length; i++){
+                    dbCodes = dbCodes + "<"+rows[i]["code"]+">"+rows[i]["incident_type"]+"</"+rows[i]["code"]+">\n";
+                }
+                dbCodes = dbCodes + "</codes>";
+            }else{
+                code = code.toString();
+                var codeArr = code.split(",");
+                for(var i = 0; i<rows.length; i++){
+                    for(var j=0; j<code.length;j++){
+                        if(rows[i]["code"] == codeArr[j]){
+                            dbCodes = dbCodes + "<"+rows[i]["code"]+">"+rows[i]["incident_type"]+"</"+rows[i]["code"]+">\n";
+                        }
+                    }
+                }
+                dbCodes = dbCodes + "</codes>";
+            }
         }
         //dbCodes = JSON.parse(dbCodes);
         res.setHeader('Content-Type', 'application/json');
         res.status(200).send(dbCodes);
-    });  
-    
+    });
+
 });
 
 app.get("/neighborhoods", (req, res)=>{
@@ -96,7 +117,12 @@ app.get("/neighborhoods", (req, res)=>{
 app.get("/incidents", (req, res)=>{
     db.all("SELECT case_number, code, incident, police_grid, neighborhood_number, block, DATE(date_time) as dateOfIncident, TIME(date_time) as timeOfIncident FROM incidents", (err, rows)=>{
         var dbIncidents = "";
-        for(i = 0; i < rows.length; i++) {
+        var theLength = rows.length;
+        var limit = req.query.limit;
+        if(limit != null){
+            theLength = limit;
+        }
+        for(i = 0; i < theLength; i++) {
             date = rows[i]["date_time"]
             dbIncidents = dbIncidents + '"I' + rows[i]["case_number"] + '": {' + "\n" +
             '"date": "' + rows[i]["dateOfIncident"] + '",' + "\n" +
