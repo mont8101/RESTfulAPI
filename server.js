@@ -135,34 +135,66 @@ app.get("/neighborhoods", (req, res) => {
 });
 
 app.get("/incidents", (req, res)=>{
-    db.all("SELECT case_number, code, incident, police_grid, neighborhood_number, block, DATE(date_time) as dateOfIncident, TIME(date_time) as timeOfIncident FROM incidents", (err, rows)=>{
+    db.all("SELECT case_number, code, incident, police_grid, neighborhood_number, block, DATE(date_time) as dateOfIncident, TIME(date_time) as timeOfIncident FROM incidents", (err, rows) => {
         var dbIncidents = "";
         var theLength = rows.length;
         var limit = req.query.limit;
         var code = req.query.code;
-        if(limit != null){
+        var start_date = '1900-01-01';
+        var end_date = '2020-12-12';
+        var id = null;
+        var grid = null;
+        if(req.query.grid != null){
+            grid = req.query.grid.split(",");
+        }
+        if (req.query.id != null){
+            id = req.query.id.split(",");
+        }
+        if (limit != null) {
             theLength = limit;
         }
-        if(code == null){
+        if (req.query.start_date != null) {
+            start_date = req.query.start_date;
+        }
+        if (req.query.end_date != null) {
+            end_date = req.query.end_date;
+        }
+        console.log("2016-02-02" <= '2016-02-01');
+        console.log(rows[2]["dateOfIncident"]);
+        if (code == null) {
             for (var i = 0; i < theLength; i++) {
-                date = rows[i]["date_time"]
-                dbIncidents = dbIncidents + '"I' + rows[i]["case_number"] + '": {' + "\n" +
-                    '"date": "' + rows[i]["dateOfIncident"] + '",' + "\n" +
-                    '"time": "' + rows[i]["timeOfIncident"] + '",' + "\n" +
-                    '"code": ' + rows[i]["code"] + ',' + "\n" +
-                    '"incident": "' + rows[i]["incident"] + '",' + "\n" +
-                    '"police_grid": ' + rows[i]["police_grid"] + ',' + "\n" +
-                    '"neighborhood_number": ' + rows[i]["neighborhood_number"] + ',' + "\n" +
-                    '"block": "' + rows[i]["block"] + '",' + "\n" + "}," + "\n"
-            }
-        }else{
-            code = code.toString();
-            code = code.split(",");
-            //console.log("am here");
-            for (var i = 0; i < theLength; i++) {
-                for(var j=0; j<code.length; j++){
-                    if(rows[i]["code"]==code[j]){
-                        date = rows[i]["date_time"]
+                date = rows[i]["dateOfIncident"];
+                //console.log(date);
+                if (date >= start_date && date <= end_date) {
+                    if (id != null) {
+                        for (var j = 0; j < id.length; j++) {
+                            if (rows[i]["neighborhood_number"] == id[j]) {
+                                if (grid != null) {
+                                    for (var k = 0; k < grid.length; k++) {
+                                        if(rows[i]==grid[k]){
+                                        dbIncidents = dbIncidents + '"I' + rows[i]["case_number"] + '": {' + "\n" +
+                                            '"date": "' + rows[i]["dateOfIncident"] + '",' + "\n" +
+                                            '"time": "' + rows[i]["timeOfIncident"] + '",' + "\n" +
+                                            '"code": ' + rows[i]["code"] + ',' + "\n" +
+                                            '"incident": "' + rows[i]["incident"] + '",' + "\n" +
+                                            '"police_grid": ' + rows[i]["police_grid"] + ',' + "\n" +
+                                            '"neighborhood_number": ' + rows[i]["neighborhood_number"] + ',' + "\n" +
+                                            '"block": "' + rows[i]["block"] + '",' + "\n" + "}," + "\n";
+                                        }
+                                    }
+                                } else {
+                                    dbIncidents = dbIncidents + '"I' + rows[i]["case_number"] + '": {' + "\n" +
+                                        '"date": "' + rows[i]["dateOfIncident"] + '",' + "\n" +
+                                        '"time": "' + rows[i]["timeOfIncident"] + '",' + "\n" +
+                                        '"code": ' + rows[i]["code"] + ',' + "\n" +
+                                        '"incident": "' + rows[i]["incident"] + '",' + "\n" +
+                                        '"police_grid": ' + rows[i]["police_grid"] + ',' + "\n" +
+                                        '"neighborhood_number": ' + rows[i]["neighborhood_number"] + ',' + "\n" +
+                                        '"block": "' + rows[i]["block"] + '",' + "\n" + "}," + "\n";
+                                }
+                            }
+                        }
+                    } else {
                         dbIncidents = dbIncidents + '"I' + rows[i]["case_number"] + '": {' + "\n" +
                             '"date": "' + rows[i]["dateOfIncident"] + '",' + "\n" +
                             '"time": "' + rows[i]["timeOfIncident"] + '",' + "\n" +
@@ -173,11 +205,71 @@ app.get("/incidents", (req, res)=>{
                             '"block": "' + rows[i]["block"] + '",' + "\n" + "}," + "\n";
                     }
                 }
+
+            }
+        } else {
+            code = code.toString();
+            code = code.split(",");
+            //console.log("am here");
+            /*for (var i = 0; i < theLength; i++)*/
+            var i = 0;
+            while (theLength > i && i != rows.length) {
+                for (var j = 0; j < code.length; j++) {
+                    if (rows[i]["code"] == code[j]) {
+                        //date = rows[i]["date_time"]
+                        date = rows[i]["dateOfIncident"];
+                        //console.log(date);
+                        if (date>=start_date && date<= end_date) {
+                            if (id != null) {
+                                for (var j = 0; j < id.length; j++) {
+                                    if (rows[i]["neighborhood_number"] == id[j]) {
+                                        if (grid != null) {
+                                            for (var k = 0; k < grid.length; k++) {
+                                                if(rows[i]==grid[k]){
+                                                dbIncidents = dbIncidents + '"I' + rows[i]["case_number"] + '": {' + "\n" +
+                                                    '"date": "' + rows[i]["dateOfIncident"] + '",' + "\n" +
+                                                    '"time": "' + rows[i]["timeOfIncident"] + '",' + "\n" +
+                                                    '"code": ' + rows[i]["code"] + ',' + "\n" +
+                                                    '"incident": "' + rows[i]["incident"] + '",' + "\n" +
+                                                    '"police_grid": ' + rows[i]["police_grid"] + ',' + "\n" +
+                                                    '"neighborhood_number": ' + rows[i]["neighborhood_number"] + ',' + "\n" +
+                                                    '"block": "' + rows[i]["block"] + '",' + "\n" + "}," + "\n";
+                                                }
+                                            }
+                                        } else {
+                                            dbIncidents = dbIncidents + '"I' + rows[i]["case_number"] + '": {' + "\n" +
+                                                '"date": "' + rows[i]["dateOfIncident"] + '",' + "\n" +
+                                                '"time": "' + rows[i]["timeOfIncident"] + '",' + "\n" +
+                                                '"code": ' + rows[i]["code"] + ',' + "\n" +
+                                                '"incident": "' + rows[i]["incident"] + '",' + "\n" +
+                                                '"police_grid": ' + rows[i]["police_grid"] + ',' + "\n" +
+                                                '"neighborhood_number": ' + rows[i]["neighborhood_number"] + ',' + "\n" +
+                                                '"block": "' + rows[i]["block"] + '",' + "\n" + "}," + "\n";
+                                        }
+                                    }
+                                }
+                            } else {
+                                dbIncidents = dbIncidents + '"I' + rows[i]["case_number"] + '": {' + "\n" +
+                                    '"date": "' + rows[i]["dateOfIncident"] + '",' + "\n" +
+                                    '"time": "' + rows[i]["timeOfIncident"] + '",' + "\n" +
+                                    '"code": ' + rows[i]["code"] + ',' + "\n" +
+                                    '"incident": "' + rows[i]["incident"] + '",' + "\n" +
+                                    '"police_grid": ' + rows[i]["police_grid"] + ',' + "\n" +
+                                    '"neighborhood_number": ' + rows[i]["neighborhood_number"] + ',' + "\n" +
+                                    '"block": "' + rows[i]["block"] + '",' + "\n" + "}," + "\n";
+                            }
+                        }
+                    }
+                    else {
+                        theLength++;
+                    }
+                    i++;
+                }
             }
         }
-        
-        
-        
+
+
+
         res.setHeader('Content-Type', 'application/json');
         res.status(200).send(dbIncidents);
     });
