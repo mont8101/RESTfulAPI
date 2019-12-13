@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Ben and Scott's super cool map</title>
+<link href='https://api.mapbox.com/mapbox.js/v3.2.1/mapbox.css' rel='stylesheet' />
+<script src='https://api.mapbox.com/mapbox.js/v3.2.1/mapbox.js'></script>
+<link rel="stylesheet" href="functional.css"> 
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script type="application/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="application/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script type="application/javascript" src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src='main.js'></script>
+</head>
+
+<body onload="Init()">
+<div id='map'></div>
+
+<div id="app">
+    <input v-model = "input" id = "searchbox" placeholder="Enter Location">
+    <button type = "button" @click = "Search">Search</button>
+</div>
+
+<div id="crimeTable">
+    <table v-if="search_results.length > 0">
+        <thead>
+            <tr>
+                <th> Case Number </th>
+                <th> Incident Type  </th>
+                <th> Date </th>
+                <th> Address </th>
+                <th> Neighborhood </th>
+                <th> Police Grid </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="crime in search_results">
+                <td> {{ crime.case_number }}</td>
+                <td> {{ crime.incident }} </td>
+                <td> {{ crime.date }} </td>
+                <td> {{ crime.address }} </td>
+                <td> {{ crime.neighborhood_number }} </td>
+                <td> {{ crime.police_grid }} </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="dialog-form">
+    <label for="name">URL for St. Paul Crime API:</label>
+    <input type="text" id="prompt_input" class="text ui-widget-content ui-corner-all" style="width: 320px;"/>
+</div>
+</body>
+</html>
