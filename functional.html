@@ -22,13 +22,14 @@
 
 <div id="search_bar">
         <form>
-            <select name = "dropdown">
+            <select name = "dropdown" id ="dropdown">
                 <option value = "address" selected>Address</option>
                 <option value = "coordinates">Coordinates</option>
             </select>
+            <input type="text" v-model=input placeholder="Enter "+dropdown  />
+            <button type="button" @click="Submit">Search</button>
         </form>
-    <input type="text" v-model="address" placeholder="Enter Address" />
-    <button type="button" @click="Submit">Search</button>
+    
 </div>
 
 <div>
@@ -41,19 +42,20 @@
                 <th> Code </th>
                 <th> Incident </th>
                 <th> Police Grid </th>
-                <th> Neighborhood Numberer </th>
+                <th> Neighborhood </th>
                 <th> Block </th>
             </tr>
         </thead>
         <tbody>
             <tr v-for="item in search_results">
-                <td></td>
-                <td>{{ item.name }}</td>
-                <td>{{ item.genres }}</td>
-                <td>{{ item.popularity }}</td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td> {{ crime.case_number }}</td>
+                <td> {{ crime.date }} </td>
+                <td> {{ crime.time }} </td>
+                <td> {{ crime.code }} </td>
+                <td> {{ crime.incident }} </td>
+                <td> {{ crime.police_grid }} </td>
+                <td> {{ crime.neighborhood_number }} </td>
+                <td> {{ crime.block }} </td>
             </tr>
         </tbody>
     </table>
