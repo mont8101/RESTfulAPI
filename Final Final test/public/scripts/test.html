@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Prompt Test</title>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" />
+	<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script type="application/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script type="application/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="scripts/main.js"></script>
+
+</head>
+<body onload="Prompt()">
+	<div id="map"></div>
+    <div id = "app">
+        <input v-model = "input" id = "searchbar" placeholder="enter address or coordinates">
+        <button type = "button" @click = "searchLocation">Search</button>
+    
+
+        <div id = "crimeTable">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Case Number</th>
+                        <th>Incident Type</th>
+                        <th>Date</th>
+                        <th>Address</th>
+                        <th>Neighborhood</th>
+                        <th>Police Grid</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for = 'item in rowData' v-if='visibleOnMap(item.neighborhood)' @click="addIncidentMarker(incident.incident, incident.date, incident.address, incident.neighborhood, incident.policeGrid);" :style="crimeTypeBackground(incident.codeNumber)">
+						<td>{{ item.codeNumber }}</td>
+						<td>{{ item.incident }}</td>
+						<td>{{ item.date }}</td>
+						<td>{{ item.address }}</td>
+						<td>{{ item.neighborhood }}</td>
+						<td>{{ item.policeGrid }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <button id = 'button' type = "button" onclick="window.location.href = 'about.html'">About</button>
+    </div>
+    <div id="dialog-form">
+        <label for="name">URL for St. Paul Crime API:</label>
+        <input type="text" id="prompt_input" class="text ui-widget-content ui-corner-all" style="width: 320px;"/>
+    </div>
+	</body>
+</html>
